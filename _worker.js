@@ -1629,6 +1629,20 @@ export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
         const path = url.pathname;
+
+        // 最小健康检查：不访问任何第三方接口，用于确认域名和路由已指向本 Worker。
+        if (path === '/health') {
+            return new Response(JSON.stringify({
+                ok: true,
+                service: 'preferred-ip-worker',
+                time: new Date().toISOString()
+            }), {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Cache-Control': 'no-store'
+                }
+            });
+        }
         
         // 主页
         if (path === '/' || path === '') {
